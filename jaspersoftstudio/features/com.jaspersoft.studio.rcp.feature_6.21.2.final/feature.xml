@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="com.jaspersoft.studio.rcp.feature"
+      label="RCP feature for Jaspersoft Studio Community"
+      version="6.21.2.final"
+      provider-name="Cloud Software Group, Inc."
+      os="linux,macosx,win32"
+      ws="cocoa,gtk,win32">
+
+   <description url="https://community.jaspersoft.com/project/jaspersoft-studio">
+      RCP feature for the version Jaspersoft Studio Community Edition
+   </description>
+
+   <copyright>
+      Copyright (C) 2010 - 2024. Cloud Software Group, Inc.
+   </copyright>
+
+   <url>
+      <update label="Jaspersoft Studio update site" url="https://jasperstudio.sf.net/updates"/>
+      <discovery label="Jaspersoft Studio Community Edition" url="https://community.jaspersoft.com/project/jaspersoft-studio"/>
+   </url>
+
+   <includes
+         id="com.jaspersoft.studio.feature"
+         version="6.21.2.final"
+         search-location="both"/>
+
+   <includes
+         id="org.tigris.subversion.clientadapter.svnkit.feature"
+         version="1.8.12.3"
+         optional="true"
+         search-location="both"/>
+
+   <includes
+         id="org.tmatesoft.svnkit"
+         version="1.8.12.r10533_v20160129_0158"
+         optional="true"
+         search-location="both"/>
+
+   <includes
+         id="org.tigris.subversion.subclipse"
+         version="4.3.0.201901172050"
+         optional="true"
+         search-location="both"/>
+
+   <includes
+         id="org.eclipse.egit"
+         version="6.7.0.202309050840-r"
+         optional="true"
+         search-location="both"/>
+
+   <includes
+         id="org.eclipse.jgit"
+         version="6.7.0.202309050840-r"
+         optional="true"
+         search-location="both"/>
+
+   <includes
+         id="org.eclipse.jgit.pgm"
+         version="6.7.0.202309050840-r"
+         optional="true"
+         search-location="both"/>
+
+   <includes
+         id="com.jaspersoft.studio.jre.feature"
+         version="17.0.8.1_1"
+         search-location="both"/>
+
+   <includes
+         id="org.eclipse.equinox.p2.user.ui"
+         version="2.4.2100.v20230814-2013"
+         search-location="both"/>
+
+   <includes
+         id="com.jaspersoft.studio.i18n.feature"
+         version="1.0.0.nl"
+         search-location="both"/>
+
+   <includes
+         id="org.eclipse.rcp"
+         version="4.29.0.v20230903-1000"/>
+
+   <includes
+         id="org.eclipse.jgit.http.apache"
+         version="6.7.0.202309050840-r"/>
+
+   <includes
+         id="org.eclipse.help"
+         version="2.3.1500.v20230903-1000"/>
+
+   <requires>
+      <import plugin="org.eclipse.ui.intro"/>
+      <import plugin="com.jaspersoft.studio" version="6.21.2" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.browser" version="3.3.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.debug.ui"/>
+      <import plugin="org.eclipse.equinox.p2.operations" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.equinox.p2.core" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.equinox.p2.ui" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.equinox.p2.metadata" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.equinox.p2.engine" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.views.log"/>
+      <import plugin="org.eclipse.debug.core" version="3.12.0" match="compatible"/>
+      <import plugin="org.eclipse.jdt.debug" version="3.20.0" match="compatible"/>
+      <import plugin="org.eclipse.core.runtime" version="3.11.0" match="compatible"/>
+      <import plugin="org.eclipse.jdt.core" version="3.32.0" match="compatible"/>
+      <import plugin="org.eclipse.jdt.launching" version="3.19.0" match="compatible"/>
+      <import plugin="org.eclipse.jface" version="3.5.0" match="compatible"/>
+      <import plugin="org.eclipse.ui" version="3.5.0" match="compatible"/>
+      <import plugin="org.eclipse.e4.ui.css.swt.theme"/>
+      <import plugin="org.eclipse.core.net" version="1.0.0" match="compatible"/>
+      <import plugin="com.jaspersoft.studio.rcp" version="6.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.help" version="3.2.0" match="compatible"/>
+   </requires>
+
+   <plugin
+         id="com.jaspersoft.studio.rcp"
+         download-size="1194"
+         install-size="2190"
+         version="6.21.2.final"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.jdt.launching.macosx"
+         os="macosx"
+         download-size="21"
+         install-size="32"
+         version="3.6.100.v20230630-1429"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.jdt.launching.ui.macosx"
+         os="macosx"
+         download-size="61"
+         install-size="107"
+         version="1.4.100.v20230630-1429"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ui.themes"
+         download-size="34"
+         install-size="85"
+         version="1.2.2300.v20230807-1354"/>
+
+   <plugin
+         id="org.eclipse.ui.net"
+         download-size="47"
+         install-size="86"
+         version="1.5.100.v20230726-0617"
+         unpack="false"/>
+
+   <plugin
+         id="com.jaspersoft.studio.rcp.macosx"
+         os="macosx"
+         download-size="4"
+         install-size="5"
+         version="1.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.egit.doc"
+         download-size="4562"
+         install-size="5015"
+         version="6.7.0.202309050840-r"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.jdt.doc.user"
+         download-size="7853"
+         install-size="10592"
+         version="3.15.1900.v20230829-1836"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.platform.doc.user"
+         download-size="3603"
+         install-size="4927"
+         version="4.29.0.v20230829-1836"
+         unpack="false"/>
+
+</feature>

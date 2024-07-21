@@ -23,16 +23,12 @@ public class Task {
         this.taskType = taskType;
     }
 
-    /**
-     * @return the tasId
-     */
+  
     public int getTasId() {
         return tasId;
     }
 
-    /**
-     * @param tasId the tasId to set
-     */
+    
     public void setTasId(Integer tasId) {
         this.tasId = tasId;
     }
@@ -120,6 +116,8 @@ public class Task {
     public void setTaskType(String taskType) {
         this.taskType = taskType;
     }
+    
+    
 
     
    

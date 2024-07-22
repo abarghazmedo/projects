@@ -8,16 +8,19 @@ import java.util.Arrays;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
-
 public class Login extends javax.swing.JFrame {
+
+    String permission;
+
+    static String userName;
 
     public Login() {
         initComponents();
-          try {
-             Image img = ImageIO.read(getClass().getResource("/adminIcons/code.png"));
-             this.setIconImage(img);
-         } catch (Exception e) {
-         }
+        try {
+            Image img = ImageIO.read(getClass().getResource("/adminIcons/code.png"));
+            this.setIconImage(img);
+        } catch (Exception e) {
+        }
     }
 
     //validaion login if tetfiled empty 
@@ -34,53 +37,40 @@ public class Login extends javax.swing.JFrame {
         }
         return true;
     }
-    
-     String permission;
-     
-     
-     static String userName;
 
     //verify to entre application
     public void login() {
-    String email = txt_username.getText();
-    char[] password = txt_password.getPassword(); // Assuming txt_password is a JPasswordField
+        String email = txt_username.getText();
+        char[] password = txt_password.getPassword(); // Assuming txt_password is a JPasswordField
 
-    try (Connection con = DBconnection.getConnection()) {
-        String query = "SELECT UserName FROM userp WHERE UserEmail = ? AND UserPassword = ?";
-        try (PreparedStatement prs = con.prepareStatement(query)) {
-            prs.setString(1, email);
-            prs.setString(2, String.valueOf(password));
+        try (Connection con = DBconnection.getConnection()) {
+            String query = "SELECT UserName FROM userp WHERE UserEmail = ? AND UserPassword = ?";
+            try (PreparedStatement prs = con.prepareStatement(query)) {
+                prs.setString(1, email);
+                prs.setString(2, String.valueOf(password));
 
-            try (ResultSet rs = prs.executeQuery()) {
-                if (rs.next()) {
-                    userName = rs.getString("UserName");
-                    new Dashbord(email,userName).setVisible(true);
-                    this.setVisible(false);
-                    new Project(email);
-                    new Task(email);
-                    new SubTask(email);
+                try (ResultSet rs = prs.executeQuery()) {
+                    if (rs.next()) {
+                        userName = rs.getString("UserName");
+                        new Dashbord(email, userName).setVisible(true);
+                        this.setVisible(false);
+                        new Project(email);
+                        new Task(email);
+                        new SubTask(email);
+
                   
-                   
-                    
-         
-                    
-                  // Project pr= new Project(email);
-                } else {
-                    JOptionPane.showMessageDialog(this, "Login is not correct!");
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Login is not correct!");
+                    }
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            // Clear the password array for security reasons
+            Arrays.fill(password, '0');
         }
-    } catch (Exception e) {
-        e.printStackTrace();
-    } finally {
-        // Clear the password array for security reasons
-        Arrays.fill(password, '0');
     }
-}
-     
-  
-
-
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -201,7 +191,7 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_jLabel2MouseClicked
 
     private void rSButtonHover1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rSButtonHover1ActionPerformed
-         if (validateLogin()) {
+        if (validateLogin()) {
             login();
         }
     }//GEN-LAST:event_rSButtonHover1ActionPerformed
@@ -211,10 +201,9 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_txt_passwordActionPerformed
 
     private void jLabel4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel4MouseClicked
-         this.setExtendedState(Login.ICONIFIED);
+        this.setExtendedState(Login.ICONIFIED);
     }//GEN-LAST:event_jLabel4MouseClicked
 
- 
     public static void main(String args[]) {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -232,9 +221,7 @@ public class Login extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-       
 
-       
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new Login().setVisible(true);

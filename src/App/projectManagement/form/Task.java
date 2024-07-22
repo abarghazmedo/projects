@@ -72,7 +72,6 @@ public class Task extends javax.swing.JFrame {
     
     
     public void managePermissionLabel(ArrayList<String> per) {
-        System.out.println("permissionData dqsh" + per);
         if (per.contains("Project edit") || per.contains("Project view")) {
             jPanel5.setVisible(true);
 
@@ -112,7 +111,7 @@ public class Task extends javax.swing.JFrame {
             jPanel7.setVisible(true);
 
         }
-            System.out.println("permissionData.contains(\"Role hide\")"+ per.contains("Role hide"));
+         
         if (per.contains("Role hide")) {    
             jPanel7.setVisible(false);
         }
@@ -211,7 +210,6 @@ public class Task extends javax.swing.JFrame {
     //show details task in table  
     public void setTaskToTable() {
         String roleName = getRoleName();
-        System.out.println(roleName);
         model = (DefaultTableModel) tbl_task.getModel(); // Assuming tbl_task is your JTable for tasks
 
         try (Connection con = DBconnection.getConnection()) {
@@ -229,8 +227,6 @@ public class Task extends javax.swing.JFrame {
 
                 query = query + "WHERE u.UserEmail=?";
             }
-            System.out.println("Developer".equals(roleName));
-            System.out.println(query);
 
             try (PreparedStatement pst = con.prepareStatement(query)) {
                 if ("Manager".equals(roleName) || "Developer".equals(roleName)) {

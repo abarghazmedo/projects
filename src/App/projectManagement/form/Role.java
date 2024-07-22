@@ -1,8 +1,5 @@
 package App.projectManagement.form;
 
-
-
-
 import static App.projectManagement.form.Dashbord.userNameU;
 import java.awt.Image;
 import java.sql.ResultSet;
@@ -16,9 +13,8 @@ import javax.swing.JOptionPane;
 import javax.swing.table.TableModel;
 import java.sql.SQLException;
 
-
 public class Role extends javax.swing.JFrame {
-    
+
     public void icon() {
         try {
             Image img = ImageIO.read(getClass().getResource("/adminIcons/code.png"));
@@ -28,28 +24,25 @@ public class Role extends javax.swing.JFrame {
     }
 
     String name_Role;
-    static int id_Role ;
+    static int id_Role;
     DefaultTableModel model;
 
     public Role() {
         initComponents();
-        setRoleToTable();   
+        setRoleToTable();
         icon();
         ArrayList<String> permissionData = new Dashbord().permissionData;
         managePermissionLabel(permissionData);
         setUserInLabel();
 
-    } 
-     public void setUserInLabel(){
+    }
+
+    public void setUserInLabel() {
         usershow.setText(userNameU);
     }
- 
-            
-    
-    
-     
-     public void managePermissionLabel(ArrayList<String> per) {
-        System.out.println("permissionData dqsh" + per);
+
+    public void managePermissionLabel(ArrayList<String> per) {
+
         if (per.contains("Project edit") || per.contains("Project view")) {
             jPanel5.setVisible(true);
 
@@ -59,7 +52,7 @@ public class Role extends javax.swing.JFrame {
 
         }
         if (per.contains("Task edit") || per.contains("Task view")) {
-  
+
             jPanel14.setVisible(true);
 
         }
@@ -74,7 +67,6 @@ public class Role extends javax.swing.JFrame {
         if (per.contains("SubTask hide")) {
             jPanel16.setVisible(false);
 
-
         }
         if (per.contains("User edit") || per.contains("User view")) {
             jPanel6.setVisible(true);
@@ -83,24 +75,18 @@ public class Role extends javax.swing.JFrame {
         if (per.contains("User hide")) {
             jPanel6.setVisible(false);
 
-
         }
         if (per.contains("Role edit") || per.contains("Role view")) {
             jPanel7.setVisible(true);
 
         }
-            System.out.println("permissionData.contains(\"Role hide\")"+ per.contains("Role hide"));
-        if (per.contains("Role hide")) {    
+
+        if (per.contains("Role hide")) {
             jPanel7.setVisible(false);
         }
     }
-    
-    
-    
-    
-    
+
 //to set Role table 
-    
     public void setRoleToTable() {
         try {
             Connection con = DBconnection.getConnection();
@@ -110,7 +96,6 @@ public class Role extends javax.swing.JFrame {
             while (rs.next()) {
                 int idRole = rs.getInt(1);  // Assuming the ID is in the first column
                 String nameRole = rs.getString(2);  // Assuming the name is in the second column
-               
 
                 Object[] obj = {idRole, nameRole};
 
@@ -123,23 +108,21 @@ public class Role extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }
-    
-    //Add Role to tabledata 
 
+    //Add Role to tabledata 
     public boolean addRole() {
         boolean isAdded = false;
-       // id_Role = Integer.parseInt(txt_idRole.getText());
+        // id_Role = Integer.parseInt(txt_idRole.getText());
         name_Role = txt_nameRole.getText();
-       
 
         try {
             Connection con = DBconnection.getConnection();
             String sql = "insert into role (roleName)value(?)";
             PreparedStatement prs = con.prepareStatement(sql);
 
-          //  prs.setInt(1, id_Role);
+            //  prs.setInt(1, id_Role);
             prs.setString(1, name_Role);
-      
+
             int updatedrowcont = prs.executeUpdate();
             if (updatedrowcont > 0) {
                 isAdded = true;
@@ -154,20 +137,18 @@ public class Role extends javax.swing.JFrame {
     }
 
     //update Role to table 
-    
     public boolean updateRole(int id) {
         boolean isUpdate = false;
-      //  id_Role= Integer.parseInt(txt_idRole.getText());
-          name_Role = txt_nameRole.getText();
-     
+        //  id_Role= Integer.parseInt(txt_idRole.getText());
+        name_Role = txt_nameRole.getText();
 
         try {
             Connection con = DBconnection.getConnection();
-            String sql = "UPDATE role SET roleName=? WHERE RoleID="+id+";";
+            String sql = "UPDATE role SET roleName=? WHERE RoleID=" + id + ";";
             PreparedStatement prs = con.prepareStatement(sql);
 
-            prs.setString(1, name_Role);           
-           // prs.setInt(2, id_Role);
+            prs.setString(1, name_Role);
+            // prs.setInt(2, id_Role);
 
             int updatedRowCount = prs.executeUpdate();
             if (updatedRowCount > 0) {
@@ -183,17 +164,16 @@ public class Role extends javax.swing.JFrame {
     }
 
     //delete role to table
-    
-   public boolean deleteRole(int id) {
+    public boolean deleteRole(int id) {
         boolean isDelete = false;
-      //  id_Role = Integer.parseInt(txt_idRole.getText());
+        //  id_Role = Integer.parseInt(txt_idRole.getText());
 
         try {
             Connection con = DBconnection.getConnection();
-            String sql = "DELETE FROM role WHERE RoleID="+id+";";
+            String sql = "DELETE FROM role WHERE RoleID=" + id + ";";
             PreparedStatement prs = con.prepareStatement(sql);
 
-           // prs.setInt(1, id_Role);
+            // prs.setInt(1, id_Role);
             int updatedrowcont = prs.executeUpdate();
             if (updatedrowcont > 0) {
                 isDelete = true;
@@ -202,29 +182,26 @@ public class Role extends javax.swing.JFrame {
             }
 
         } catch (SQLException e) {
-                  if (e.getErrorCode() == 1451) {
+            if (e.getErrorCode() == 1451) {
                 JOptionPane.showMessageDialog(null, "Cannot delete Role because it has associated Users.", "Foreign Key Constraint", JOptionPane.ERROR_MESSAGE);
             } else {
                 e.printStackTrace(); // For other SQL exceptions, print the stack trace
             }
-    }
+        }
         return isDelete;
 
     }
-
-
 
     //clear table 
     public void clearTable() {
         DefaultTableModel model = (DefaultTableModel) tbl_project.getModel();
         model.setRowCount(0);
     }
-    public void clearform(){
+
+    public void clearform() {
         txt_nameRole.setText("");
     }
-  
 
-    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -557,33 +534,33 @@ public class Role extends javax.swing.JFrame {
 
     private void jLabel4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel4MouseClicked
         System.exit(0);
-        
+
     }//GEN-LAST:event_jLabel4MouseClicked
 
     private void jPanel4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel4MouseClicked
-         Dashbord dashbord = new Dashbord();
+        Dashbord dashbord = new Dashbord();
         dashbord.setVisible(true);
         dispose();
     }//GEN-LAST:event_jPanel4MouseClicked
 
     private void jPanel14MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel14MouseClicked
- new Task().setVisible(true);
- dispose();
-       
+        new Task().setVisible(true);
+        dispose();
+
     }//GEN-LAST:event_jPanel14MouseClicked
 
     private void jPanel5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel5MouseClicked
- new Project().setVisible(true);
- dispose();
+        new Project().setVisible(true);
+        dispose();
     }//GEN-LAST:event_jPanel5MouseClicked
-   
+
     private void jPanel16MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel16MouseClicked
-new SubTask().setVisible(true);
-dispose();
+        new SubTask().setVisible(true);
+        dispose();
     }//GEN-LAST:event_jPanel16MouseClicked
 
     private void btn_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_addActionPerformed
-        if (addRole()== true) {
+        if (addRole() == true) {
             JOptionPane.showMessageDialog(this, "Role created succesful");
             clearTable();
             setRoleToTable();
@@ -605,36 +582,36 @@ dispose();
     }//GEN-LAST:event_btn_updateActionPerformed
 
     private void btn_deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_deleteActionPerformed
-        if (deleteRole(id_Role)== true) {
+        if (deleteRole(id_Role) == true) {
             JOptionPane.showMessageDialog(this, "Role Delet succesful");
             clearTable();
             setRoleToTable();
 
-        } 
+        }
     }//GEN-LAST:event_btn_deleteActionPerformed
 
     private void tbl_projectMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbl_projectMouseClicked
         int rowN = tbl_project.getSelectedRow();
         TableModel model = tbl_project.getModel();
 
-        id_Role=Integer.parseInt(model.getValueAt(rowN, 0).toString()) ;
+        id_Role = Integer.parseInt(model.getValueAt(rowN, 0).toString());
         txt_nameRole.setText(model.getValueAt(rowN, 1).toString());
-       
+
     }//GEN-LAST:event_tbl_projectMouseClicked
 
     private void jPanel6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel6MouseClicked
-    new User().setVisible(true);
-    dispose();
+        new User().setVisible(true);
+        dispose();
     }//GEN-LAST:event_jPanel6MouseClicked
 
     private void jPanel9MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel9MouseClicked
-       Login login=new Login();
-       login.setVisible(true);
-       dispose();
+        Login login = new Login();
+        login.setVisible(true);
+        dispose();
     }//GEN-LAST:event_jPanel9MouseClicked
 
     private void jLabel3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseClicked
-         Dashbord dashbord = new Dashbord();
+        Dashbord dashbord = new Dashbord();
         dashbord.setVisible(true);
         dispose();
     }//GEN-LAST:event_jLabel3MouseClicked
@@ -645,11 +622,9 @@ dispose();
     }//GEN-LAST:event_jLabel10MouseClicked
 
     private void jLabel14MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel14MouseClicked
-   this.setExtendedState(Role.ICONIFIED);
+        this.setExtendedState(Role.ICONIFIED);
     }//GEN-LAST:event_jLabel14MouseClicked
-       
- 
-   
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">

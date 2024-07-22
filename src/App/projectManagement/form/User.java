@@ -25,46 +25,44 @@ import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import net.sf.jasperreports.view.JasperViewer;
 import java.sql.SQLException;
 
-
 public class User extends javax.swing.JFrame {
-    
-    public void icon(){
-          try {
-             Image img = ImageIO.read(getClass().getResource("/adminIcons/code.png"));
-             this.setIconImage(img);
-         } catch (Exception e) {
-         }
+
+    public void icon() {
+        try {
+            Image img = ImageIO.read(getClass().getResource("/adminIcons/code.png"));
+            this.setIconImage(img);
+        } catch (Exception e) {
+        }
     }
-    
-    HashMap<String,Integer> permissionMap=new HashMap<String,Integer>();
-        
-    String name_user, email_user ,job_title,password_user,role;
-    static int id_user,roleId ;
+
+    HashMap<String, Integer> permissionMap = new HashMap<String, Integer>();
+
+    String name_user, email_user, job_title, password_user, role;
+    static int id_user, roleId;
     DefaultTableModel model;
-   
-   
+
     public User() {
         initComponents();
         setUserToTable();
         bindcomboRole();
         icon();
         setUserInLabel();
-        if (!new Dashbord().permissionData.isEmpty() && new Dashbord().permissionData.size() >0){ 
-             ArrayList<String> permissionData = new Dashbord().permissionData;
-             if(permissionData.size() >0 ){
-                  managePermissionLabel(permissionData);
-             }
-        
+        if (!new Dashbord().permissionData.isEmpty() && new Dashbord().permissionData.size() > 0) {
+            ArrayList<String> permissionData = new Dashbord().permissionData;
+            if (permissionData.size() > 0) {
+                managePermissionLabel(permissionData);
+            }
+
         }
-       
-                 
+
     }
-     public void setUserInLabel(){
+
+    public void setUserInLabel() {
         usershow.setText(userNameU);
     }
-    
-     public void managePermissionLabel(ArrayList<String> per) {
-        System.out.println("permissionData dqsh" + per);
+
+    public void managePermissionLabel(ArrayList<String> per) {
+
         if (per.contains("Project edit") || per.contains("Project view")) {
             jPanel5.setVisible(true);
 
@@ -74,7 +72,7 @@ public class User extends javax.swing.JFrame {
 
         }
         if (per.contains("Task edit") || per.contains("Task view")) {
-  
+
             jPanel14.setVisible(true);
 
         }
@@ -89,7 +87,6 @@ public class User extends javax.swing.JFrame {
         if (per.contains("SubTask hide")) {
             jPanel16.setVisible(false);
 
-
         }
         if (per.contains("User edit") || per.contains("User view")) {
             jPanel6.setVisible(true);
@@ -98,20 +95,18 @@ public class User extends javax.swing.JFrame {
         if (per.contains("User hide")) {
             jPanel6.setVisible(false);
 
-
         }
         if (per.contains("Role edit") || per.contains("Role view")) {
             jPanel7.setVisible(true);
 
         }
-            System.out.println("permissionData.contains(\"Role hide\")"+ per.contains("Role hide"));
-        if (per.contains("Role hide")) {    
+
+        if (per.contains("Role hide")) {
             jPanel7.setVisible(false);
         }
     }
-    
-   
-       //validaion user if textfiled empty 
+
+    //validaion user if textfiled empty 
     public boolean validateuser() {
         String name = txt_nameUser.getText().trim();
         String Emaill = txt_emailUser.getText().trim();
@@ -119,13 +114,12 @@ public class User extends javax.swing.JFrame {
         Object selectedrole = cmbrol.getSelectedItem();
         String role = selectedrole != null ? selectedrole.toString().trim() : "";
         String password = txt_passwordUser.getText().trim();
-      
 
         if (name.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please Enter Name !");
             return false;
         }
-         if (Emaill.isEmpty()) {
+        if (Emaill.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please Enter Email!");
             return false;
         }
@@ -141,12 +135,10 @@ public class User extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Please Enter Password !");
             return false;
         }
-      
 
         return true;
     }
 
-  
     //get Id Permission
     public int getPermission(String name) {
         int permissionID = -1; // Default value in case no permission is found
@@ -173,110 +165,108 @@ public class User extends javax.swing.JFrame {
         return permissionID;
     }
 
-public int addPermission(int userID, int permissionId) {
-    int generatedId = -1; // Default value in case the ID retrieval fails
+    public int addPermission(int userID, int permissionId) {
+        int generatedId = -1; // Default value in case the ID retrieval fails
 
-    try (Connection con = DBconnection.getConnection();
-         PreparedStatement prs = con.prepareStatement(
-             "INSERT INTO `userpermission` (`UserID`, `PermissionID`) VALUES (?, ?)", 
-             Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection con = DBconnection.getConnection(); PreparedStatement prs = con.prepareStatement(
+                "INSERT INTO `userpermission` (`UserID`, `PermissionID`) VALUES (?, ?)",
+                Statement.RETURN_GENERATED_KEYS)) {
 
-        prs.setInt(1, userID);
-        prs.setInt(2, permissionId);
+            prs.setInt(1, userID);
+            prs.setInt(2, permissionId);
 
-        // Execute the update
-        int affectedRows = prs.executeUpdate();
+            // Execute the update
+            int affectedRows = prs.executeUpdate();
 
-        // Check if the record was inserted successfully
-        if (affectedRows > 0) {
-            // Retrieve the auto-generated ID
-            try (ResultSet generatedKeys = prs.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    generatedId = generatedKeys.getInt(1);
+            // Check if the record was inserted successfully
+            if (affectedRows > 0) {
+                // Retrieve the auto-generated ID
+                try (ResultSet generatedKeys = prs.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        generatedId = generatedKeys.getInt(1);
+                    }
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+
+        return generatedId;
     }
 
-    return generatedId;
-}
-   
     public boolean updatePermission(int userID, Integer idper) {
-    boolean isUpdated = false;
+        boolean isUpdated = false;
 
-    // SQL statement to update user permissions
-    String sql = "UPDATE `userpermission` SET  `PermissionID` = ? WHERE `UserID` = ?";
-   
+        // SQL statement to update user permissions
+        String sql = "UPDATE `userpermission` SET  `PermissionID` = ? WHERE `UserID` = ?";
 
-    try (Connection con = DBconnection.getConnection(); PreparedStatement prs = con.prepareStatement(sql)) {
-        // Set parameters for the prepared statement
-        prs.setInt(1, idper);
-        prs.setInt(2, userID);
+        try (Connection con = DBconnection.getConnection(); PreparedStatement prs = con.prepareStatement(sql)) {
+            // Set parameters for the prepared statement
+            prs.setInt(1, idper);
+            prs.setInt(2, userID);
 
-        // Execute the update
-        int affectedRows = prs.executeUpdate();
+            // Execute the update
+            int affectedRows = prs.executeUpdate();
 
-        // Check if the record was updated successfully
-        if (affectedRows > 0) {
-            isUpdated = true;
+            // Check if the record was updated successfully
+            if (affectedRows > 0) {
+                isUpdated = true;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        return isUpdated;
+    }
+    //delete id User and ID permission to dataBase in Table userPermission
+
+    public int deletePermission(int userID, int permissionId) {
+        try (Connection con = DBconnection.getConnection(); PreparedStatement prs = con.prepareStatement("DELETE FROM userpermission WHERE UserID = ? AND PermissionID = ?")) {
+
+            prs.setInt(1, userID);
+            prs.setInt(2, permissionId);
+
+            return prs.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 
-    return isUpdated;
-}
-     //delete id User and ID permission to dataBase in Table userPermission
-     public int deletePermission(int userID, int permissionId) {
-    try (Connection con = DBconnection.getConnection();
-         PreparedStatement prs = con.prepareStatement("DELETE FROM userpermission WHERE UserID = ? AND PermissionID = ?")) {
+    public void deleteAllPermission(int userId) {
+        try (Connection con = DBconnection.getConnection(); PreparedStatement prs = con.prepareStatement("DELETE FROM userpermission WHERE UserID = ? ")) {
 
-        prs.setInt(1, userID);
-        prs.setInt(2, permissionId);
+            prs.setInt(1, userId);
+            prs.execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        return prs.executeUpdate();
-    } catch (Exception e) {
-        e.printStackTrace();
-        return -1;
     }
-}
-     public void deleteAllPermission(int userId){
-          try (Connection con = DBconnection.getConnection();
-         PreparedStatement prs = con.prepareStatement("DELETE FROM userpermission WHERE UserID = ? ")) {
 
-        prs.setInt(1, userId);
-        prs.execute();
-    } catch (Exception e) {
-        e.printStackTrace();      
-    }
-         
-     }
-     
-         //check duplicate NameTask
+    //check duplicate NameTask
     public boolean checkDuplicate() {
-    String name = txt_nameUser.getText().trim();
-    boolean isExist = false;
+        String name = txt_nameUser.getText().trim();
+        boolean isExist = false;
 
-    try {
-        Connection con = DBconnection.getConnection();
-        String query = "SELECT * FROM userp WHERE UserName = ?";
-        PreparedStatement prs = con.prepareStatement(query);
-        prs.setString(1, name);
-        ResultSet rs = prs.executeQuery();
+        try {
+            Connection con = DBconnection.getConnection();
+            String query = "SELECT * FROM userp WHERE UserName = ?";
+            PreparedStatement prs = con.prepareStatement(query);
+            prs.setString(1, name);
+            ResultSet rs = prs.executeQuery();
 
-        if (rs.next()) {
-            isExist = true;
+            if (rs.next()) {
+                isExist = true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+
+        return isExist;
     }
 
-      return isExist;
-    }
-    
     //show details User in table
     public void setUserToTable() {
         try {
@@ -303,7 +293,7 @@ public int addPermission(int userID, int permissionId) {
             e.printStackTrace();
         }
     }
-    
+
     //Add details User to database 
     public int addUser() {
         int generatedUserId = -1;
@@ -349,33 +339,30 @@ public int addPermission(int userID, int permissionId) {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    //    System.out.println(generatedUserId);
+        //    System.out.println(generatedUserId);
         return generatedUserId;
     }
 
     //update user to table 
-    
-     public boolean updateUser(int id) {
-      boolean isUpdate = false;
-      //  id_user = Integer.parseInt(txt_idUser.getText());
+    public boolean updateUser(int id) {
+        boolean isUpdate = false;
+        //  id_user = Integer.parseInt(txt_idUser.getText());
         name_user = txt_nameUser.getText();
         email_user = txt_emailUser.getText();
-        job_title=txt_jobtitle.getText();
+        job_title = txt_jobtitle.getText();
         cmbrole1.getSelectedItem().toString();
-        password_user=txt_passwordUser.getText();
-    
+        password_user = txt_passwordUser.getText();
+
         try {
             Connection con = DBconnection.getConnection();
-            String sql = "UPDATE userp SET UserName=?, UserEmail=?, UserJob=?, RoleID=?,  UserPassword=?  WHERE UserID="+id+";";
+            String sql = "UPDATE userp SET UserName=?, UserEmail=?, UserJob=?, RoleID=?,  UserPassword=?  WHERE UserID=" + id + ";";
             PreparedStatement prs = con.prepareStatement(sql);
 
-            
             prs.setString(1, name_user);
             prs.setString(2, email_user);
             prs.setString(3, job_title);
-            prs.setString(4, String.valueOf(roleId));      
+            prs.setString(4, String.valueOf(roleId));
             prs.setString(5, password_user);
-           
 
             int updatedRowCount = prs.executeUpdate();
             if (updatedRowCount > 0) {
@@ -383,80 +370,76 @@ public int addPermission(int userID, int permissionId) {
             } else {
                 isUpdate = false;
             }
-           
+
             deleteAllPermission(id);
             for (Map.Entry<String, Integer> p : permissionMap.entrySet()) {
                 Integer idPerm = p.getValue();
-                addPermission(id, idPerm);            
-                System.out.println("id "+id );
-                System.out.println("Id Per"+idPerm);
-                
-            }
+                addPermission(id, idPerm);
+                System.out.println("id " + id);
+                System.out.println("Id Per" + idPerm);
 
-           
-            
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
         return isUpdate;
     }
-   
+
     //delete user to table      
- public boolean deleteUser(int id) {
-    try (Connection con = DBconnection.getConnection()) {
-        con.setAutoCommit(false);
-        
-        String[] tables = {"subtask", "userpermission", "task"};
-        for (String table : tables) {
-            String deleteSQL = "DELETE FROM " + table + " WHERE UserID = ?";
-            PreparedStatement deleteStmt = con.prepareStatement(deleteSQL);
-            deleteStmt.setInt(1, id);
-            deleteStmt.executeUpdate();
-            deleteStmt.close();
-        }
+    public boolean deleteUser(int id) {
+        try (Connection con = DBconnection.getConnection()) {
+            con.setAutoCommit(false);
 
-        String deleteUserSQL = "DELETE FROM userp WHERE UserID = ?";
-        PreparedStatement deleteUserStmt = con.prepareStatement(deleteUserSQL);
-        deleteUserStmt.setInt(1, id);
-        int updatedRowCount = deleteUserStmt.executeUpdate();
+            String[] tables = {"subtask", "userpermission", "task"};
+            for (String table : tables) {
+                String deleteSQL = "DELETE FROM " + table + " WHERE UserID = ?";
+                PreparedStatement deleteStmt = con.prepareStatement(deleteSQL);
+                deleteStmt.setInt(1, id);
+                deleteStmt.executeUpdate();
+                deleteStmt.close();
+            }
 
-        con.commit();
-        return updatedRowCount > 0;
-    } catch (SQLException e) {
-                  if (e.getErrorCode() == 1451) {
+            String deleteUserSQL = "DELETE FROM userp WHERE UserID = ?";
+            PreparedStatement deleteUserStmt = con.prepareStatement(deleteUserSQL);
+            deleteUserStmt.setInt(1, id);
+            int updatedRowCount = deleteUserStmt.executeUpdate();
+
+            con.commit();
+            return updatedRowCount > 0;
+        } catch (SQLException e) {
+            if (e.getErrorCode() == 1451) {
                 JOptionPane.showMessageDialog(null, "Cannot delete User because it has associated Project or tasks.", "Foreign Key Constraint", JOptionPane.ERROR_MESSAGE);
             } else {
                 e.printStackTrace(); // For other SQL exceptions, print the stack trace
             }
-    }
+        }
         return false;
-    
-}
-  
+
+    }
+
     //clear table 
     public void clearTable() {
         DefaultTableModel model = (DefaultTableModel) tbl_user.getModel();
         model.setRowCount(0);
     }
+
     //clear form
-    public void clearform(){
+    public void clearform() {
         txt_nameUser.setText("");
         txt_emailUser.setText("");
-         txt_jobtitle.setText("");
+        txt_jobtitle.setText("");
         txt_passwordUser.setText("");
-        cmbrole1.setSelectedItem("");  
+        cmbrole1.setSelectedItem("");
         cmbPrj.setSelectedItem("");
         cmbPrj.setSelectedItem("");
         cmbTask.setSelectedItem("");
         cmbSubtsk.setSelectedItem("");
         cmbUser.setSelectedItem("");
         cmbrol.setSelectedItem("");
-        
-        
+
     }
 
-    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -998,7 +981,7 @@ public int addPermission(int userID, int permissionId) {
 
     private void jLabel4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel4MouseClicked
         System.exit(0);
-        
+
     }//GEN-LAST:event_jLabel4MouseClicked
 
     private void jPanel4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel4MouseClicked
@@ -1008,34 +991,34 @@ public int addPermission(int userID, int permissionId) {
     }//GEN-LAST:event_jPanel4MouseClicked
 
     private void jPanel14MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel14MouseClicked
- new Task().setVisible(true);
- dispose();
-       
+        new Task().setVisible(true);
+        dispose();
+
     }//GEN-LAST:event_jPanel14MouseClicked
 
     private void jPanel5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel5MouseClicked
- new Project().setVisible(true);
- dispose();
+        new Project().setVisible(true);
+        dispose();
     }//GEN-LAST:event_jPanel5MouseClicked
 
     private void jPanel7MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel7MouseClicked
- new Role().setVisible(true);
- dispose();
+        new Role().setVisible(true);
+        dispose();
     }//GEN-LAST:event_jPanel7MouseClicked
 
     private void tbl_userMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbl_userMouseClicked
         int rowN = tbl_user.getSelectedRow();
         TableModel model = tbl_user.getModel();
-        
-        id_user=Integer.parseInt(model.getValueAt(rowN, 0).toString());
+
+        id_user = Integer.parseInt(model.getValueAt(rowN, 0).toString());
         txt_nameUser.setText(model.getValueAt(rowN, 1).toString());
         txt_emailUser.setText(model.getValueAt(rowN, 2).toString());
         txt_jobtitle.setText(model.getValueAt(rowN, 3).toString());
-        cmbrole1.setSelectedItem(model.getValueAt(rowN, 4).toString()); 
+        cmbrole1.setSelectedItem(model.getValueAt(rowN, 4).toString());
         txt_passwordUser.setText(model.getValueAt(rowN, 5).toString());
-        
+
     }//GEN-LAST:event_tbl_userMouseClicked
-    public void bindcomboRole() { 
+    public void bindcomboRole() {
         DBconnection mq = new DBconnection();
         HashMap<String, Integer> map = mq.PopulateComboRole();
         for (String s : map.keySet()) {
@@ -1043,40 +1026,40 @@ public int addPermission(int userID, int permissionId) {
         }
     }
     private void jPanel16MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel16MouseClicked
-new SubTask().setVisible(true);
-dispose();
+        new SubTask().setVisible(true);
+        dispose();
     }//GEN-LAST:event_jPanel16MouseClicked
 
     private void btn_delete1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_delete1ActionPerformed
-       if (validateuser()==true) {
-        if (deleteUser(id_user) == true) {
-            JOptionPane.showMessageDialog(this, "User Delet succesful");
-            clearTable();
-            clearform();
-            setUserToTable();
-        } 
-       }
+        if (validateuser() == true) {
+            if (deleteUser(id_user) == true) {
+                JOptionPane.showMessageDialog(this, "User Delet succesful");
+                clearTable();
+                clearform();
+                setUserToTable();
+            }
+        }
     }//GEN-LAST:event_btn_delete1ActionPerformed
 
     private void btn_add1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_add1ActionPerformed
         setPermision();
-        if (validateuser()==true) {
-        if(checkDuplicate()==false){
-        if (addUser() > 0) {
-        JOptionPane.showMessageDialog(this, "User created successfully");
-        clearTable();
-        setUserToTable();
-        clearform();
-    } else {
-        JOptionPane.showMessageDialog(this, "User creation failed!");
-    }
-        }else{
+        if (validateuser() == true) {
+            if (checkDuplicate() == false) {
+                if (addUser() > 0) {
+                    JOptionPane.showMessageDialog(this, "User created successfully");
+                    clearTable();
+                    setUserToTable();
+                    clearform();
+                } else {
+                    JOptionPane.showMessageDialog(this, "User creation failed!");
+                }
+            } else {
                 JOptionPane.showMessageDialog(this, "This Name alreaddy Exist");
             }
         }
     }//GEN-LAST:event_btn_add1ActionPerformed
 
-    public void setPermision(){
+    public void setPermision() {
         int idPrj = getPermission(String.valueOf(cmbPrj.getSelectedItem()));
         permissionMap.put("PROJECT_PERMISSION", idPrj);
         int idTsk = getPermission(String.valueOf(cmbTask.getSelectedItem()));
@@ -1087,34 +1070,33 @@ dispose();
         permissionMap.put("USER_PERMISSION", idUsr);
         int idRl = getPermission(String.valueOf(cmbrol.getSelectedItem()));
         permissionMap.put("ROLE_PERMISSION", idRl);
-        
-        
+
     }
     private void btn_update1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_update1ActionPerformed
-           setPermision();      
-       if (validateuser()==true) {
-        if (updateUser(id_user) == true) {
-            JOptionPane.showMessageDialog(this, "User Update succesful");
-            clearTable();
-            clearform();
-            setUserToTable();
-        } else {
-            JOptionPane.showMessageDialog(this, "User update failed !");
-        }
-        
+        setPermision();
+        if (validateuser() == true) {
+            if (updateUser(id_user) == true) {
+                JOptionPane.showMessageDialog(this, "User Update succesful");
+                clearTable();
+                clearform();
+                setUserToTable();
+            } else {
+                JOptionPane.showMessageDialog(this, "User update failed !");
+            }
+
         }
     }//GEN-LAST:event_btn_update1ActionPerformed
 
     private void cmbrole1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbrole1ActionPerformed
-        DBconnection mq=new DBconnection();
-        HashMap<String,Integer> map=mq.PopulateComboRole();
-        roleId=map.get(cmbrole1.getSelectedItem().toString());
+        DBconnection mq = new DBconnection();
+        HashMap<String, Integer> map = mq.PopulateComboRole();
+        roleId = map.get(cmbrole1.getSelectedItem().toString());
     }//GEN-LAST:event_cmbrole1ActionPerformed
 
     private void cmbSubtskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbSubtskActionPerformed
- 
+
     }//GEN-LAST:event_cmbSubtskActionPerformed
-    
+
     private void cmbPrjActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbPrjActionPerformed
 
     }//GEN-LAST:event_cmbPrjActionPerformed
@@ -1132,7 +1114,7 @@ dispose();
     }//GEN-LAST:event_cmbrolActionPerformed
 
     private void cmbPrjItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbPrjItemStateChanged
-       
+
     }//GEN-LAST:event_cmbPrjItemStateChanged
 
     private void btn_imprimerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_imprimerActionPerformed
@@ -1154,9 +1136,9 @@ dispose();
     }//GEN-LAST:event_btn_imprimerActionPerformed
 
     private void jPanel9MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel9MouseClicked
-       Login login=new Login();
-       login.setVisible(true);
-       dispose();
+        Login login = new Login();
+        login.setVisible(true);
+        dispose();
     }//GEN-LAST:event_jPanel9MouseClicked
 
     private void jLabel3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseClicked
@@ -1200,9 +1182,7 @@ dispose();
 
     private void jLabel13MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel13MouseClicked
    this.setExtendedState(User.ICONIFIED);    }//GEN-LAST:event_jLabel13MouseClicked
-   
- 
-   
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">

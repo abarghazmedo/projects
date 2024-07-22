@@ -68,7 +68,7 @@ public class SubTask extends javax.swing.JFrame {
     
     
     public void managePermissionLabel(ArrayList<String> per) {
-        System.out.println("permissionData dqsh" + per);
+     
         if (per.contains("Project edit") || per.contains("Project view")) {
             jPanel5.setVisible(true);
 
@@ -108,7 +108,7 @@ public class SubTask extends javax.swing.JFrame {
             jPanel7.setVisible(true);
 
         }
-            System.out.println("permissionData.contains(\"Role hide\")"+ per.contains("Role hide"));
+
         if (per.contains("Role hide")) {    
             jPanel7.setVisible(false);
         }

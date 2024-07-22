@@ -1,7 +1,6 @@
 
 package App.projectManagement.form;
 
-
 import static App.projectManagement.form.Project.emailProject;
 import java.awt.Image;
 import java.sql.ResultSet;
@@ -12,24 +11,19 @@ import javax.imageio.ImageIO;
 import javax.swing.table.DefaultTableModel;
 import java.sql.PreparedStatement;
 
-
 public class Dashbord extends javax.swing.JFrame {
-   
-    public void icon(){
-              try {
-             Image img = ImageIO.read(getClass().getResource("/adminIcons/code.png"));
-             this.setIconImage(img);
-         } catch (Exception e) {
-             
-         }
+
+    public void icon() {
+        try {
+            Image img = ImageIO.read(getClass().getResource("/adminIcons/code.png"));
+            this.setIconImage(img);
+        } catch (Exception e) {
+
+        }
     }
     static String userNameU;
-    
-    
-    
-     
-    
-    static ArrayList<String> permissionData=null;
+
+    static ArrayList<String> permissionData = null;
 
     public Dashbord() {
         initComponents();
@@ -41,29 +35,24 @@ public class Dashbord extends javax.swing.JFrame {
         setUserInLabel();
     }
 
-    public Dashbord(String email,String userName) {
-        userNameU=userName;
+    public Dashbord(String email, String userName) {
+        userNameU = userName;
         initComponents();
         setProjectdetailToTable();
         setdatatocarduser();
         setdatatocardproject();
         icon();
-        permissionData =  DBconnection.permission(email);      
+        permissionData = DBconnection.permission(email);
         managePermissionLabel(permissionData);
         setUserInLabel();
-   
-      
-    }     
-    public void setUserInLabel(){
+
+    }
+
+    public void setUserInLabel() {
         usershow.setText(userNameU);
     }
-    
-    
-    
-    
-    
-        public void managePermissionLabel(ArrayList<String> per) {
-            System.out.println("permissionData dqsh" + per);
+
+    public void managePermissionLabel(ArrayList<String> per) {
         if (per.contains("Project edit") || per.contains("Project view")) {
             jPanel5.setVisible(true);
 
@@ -73,7 +62,7 @@ public class Dashbord extends javax.swing.JFrame {
 
         }
         if (per.contains("Task edit") || per.contains("Task view")) {
-  
+
             jPanel14.setVisible(true);
 
         }
@@ -88,7 +77,6 @@ public class Dashbord extends javax.swing.JFrame {
         if (per.contains("SubTask hide")) {
             jPanel15.setVisible(false);
 
-
         }
         if (per.contains("User edit") || per.contains("User view")) {
             jPanel6.setVisible(true);
@@ -97,249 +85,129 @@ public class Dashbord extends javax.swing.JFrame {
         if (per.contains("User hide")) {
             jPanel6.setVisible(false);
 
-
         }
         if (per.contains("Role edit") || per.contains("Role view")) {
             jPanel7.setVisible(true);
 
         }
-            System.out.println("permissionData.contains(\"Role hide\")"+ per.contains("Role hide"));
         if (per.contains("Role hide")) {
             jPanel7.setVisible(false);
         }
     }
-    
-    
-    
-    
-//    public void managePermission() {
-//
-//        if (permissionData.contains("Project edit") || permissionData.contains("Project view")) {
-//            Project project = new Project();
-//            project.setVisible(true);
-//        //    dispose();
-//
-//        }
-//        if (permissionData.contains("Project hide")) {
-//            new Project().setVisible(false);
-//            jPanel5.setVisible(false);
-////          this.dispose();
-//
-//        }
-//        if (permissionData.contains("Task edit") || permissionData.contains("Task view")) {
-//            Task task = new Task();
-//            task.setVisible(true);
-//        //    dispose();
-//
-//        }
-//        if (permissionData.contains("Task hide")) {
-//            new Task().setVisible(false);
-//            jPanel14.setVisible(false);
-////                        this.dispose();
-//
-//        }
-//        if (permissionData.contains("SubTask edit") || permissionData.contains("SubTask view")) {
-//            SubTask subtask = new SubTask();
-//            subtask.setVisible(true);
-//        //    dispose();
-//
-//        }
-//        if (permissionData.contains("SubTask hide")) {
-//            new SubTask().setVisible(false);
-//            jPanel5.setVisible(false);
-//
-//
-//        }
-//        if (permissionData.contains("User edit") || permissionData.contains("User view")) {
-//            User user = new User();
-//            user.setVisible(true);
-//        //    dispose();
-//
-//        }
-//        if (permissionData.contains("User hide")) {
-//            new User().setVisible(false);
-//            jPanel6.setVisible(false);
-//
-//
-//        }
-//        if (permissionData.contains("Role edit") || permissionData.contains("Role view")) {
-//            Role role = new Role();
-//            role.setVisible(true);
-//         //   dispose();
-//
-//        }
-//        if (permissionData.contains("Role hide")) {
-//            new Role().setVisible(false);
-//            jPanel7.setVisible(false);
-////                        this.dispose();
-//            //System.out.println(per.contains(new String("Role hide")));
-//        }
-//    }
 
+    public void setdatatocarduser() {
 
-     
-
-
-    
-    //SELECT p.projectName, COUNT(*) AS ToDoTaskCount FROM project p JOIN task t ON p.projectID = t.projectID WHERE t.taskStatut = 'To do' GROUP BY p.projectName;
-      public void setdatatocarduser(){
-         
-  
         try {
             Connection con = DBconnection.getConnection();
-         Statement st = con.createStatement();
-         ResultSet  rs = st.executeQuery("SELECT * FROM `userp` ");
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM `userp` ");
             rs.last();
             lblnmbrUser1.setText(Integer.toString(rs.getRow()));
             con.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
     }
-         public void setdatatocardproject(){
-         
-  
+
+    public void setdatatocardproject() {
+
         try {
             Connection con = DBconnection.getConnection();
-         Statement st = con.createStatement();
-         ResultSet  rs = st.executeQuery("SELECT * FROM `project` ");
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM `project` ");
             rs.last();
             lblnmbrProject1.setText(Integer.toString(rs.getRow()));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
     }
-         
-               public String getRoleName(){
-         String roleName=null;
-         try (Connection con = DBconnection.getConnection()) {
-             String query="SELECT r.roleName  FROM userp u , role r WHERE u.RoleID = r.RoleID AND u.UserEmail=?;";
-              try (PreparedStatement pst = con.prepareStatement(query)) {       
+
+    public String getRoleName() {
+        String roleName = null;
+        try (Connection con = DBconnection.getConnection()) {
+            String query = "SELECT r.roleName  FROM userp u , role r WHERE u.RoleID = r.RoleID AND u.UserEmail=?;";
+            try (PreparedStatement pst = con.prepareStatement(query)) {
                 pst.setString(1, String.valueOf(emailProject));
-                 try (ResultSet rs = pst.executeQuery()) {
+                try (ResultSet rs = pst.executeQuery()) {
                     while (rs.next()) {
-                        roleName= rs.getString("roleName");
+                        roleName = rs.getString("roleName");
                     }
-                 }catch(Exception e){
-                       e.printStackTrace();
-                 }
-            }             
-         }catch (Exception e) {
-        e.printStackTrace();
-    }
-         return roleName;
-   }
-               
-               
-               
-               
-          //show details project in table 
- public void setProjectdetailToTable() {
-    String roleName = getRoleName();
-    String emailProject =Project.emailProject;
-
-    // Clear the table first
-    DefaultTableModel model = (DefaultTableModel) tbl_projects.getModel();
-    model.setRowCount(0); // Clear existing rows
-
-    if (!"Manager".equals(roleName) && !"Admin".equals(roleName)) {
-        // If the user is not a Manager or Admin, do nothing
-        return;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return roleName;
     }
 
-    String query = "SELECT " +
-                   "    p.projectName, " +
-                   "    COUNT(CASE WHEN t.taskStatut = 'To do' THEN 1 END) AS ToDo, " +
-                   "    COUNT(CASE WHEN t.taskStatut = 'In Progress' THEN 1 END) AS InProgress, " +
-                   "    COUNT(CASE WHEN t.taskStatut = 'Done' THEN 1 END) AS Done, " +
-                   "    CONCAT(" +
-                   "        FLOOR(" +
-                   "            (COUNT(CASE WHEN t.taskStatut = 'Done' THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0))" +
-                   "        ), " +
-                   "        '%'" +
-                   "    ) AS ProgressPercentage " +
-                   "FROM " +
-                   "    project p " +
-                   "JOIN " +
-                   "    task t ON p.projectID = t.projectID ";
+    //show details project in table 
+    public void setProjectdetailToTable() {
+        String roleName = getRoleName();
+        String emailProject = Project.emailProject;
 
-    if ("Manager".equals(roleName)) {
-        query += "INNER JOIN userp u ON p.UserID = u.UserID WHERE u.UserEmail = ?";
-    }
+        // Clear the table first
+        DefaultTableModel model = (DefaultTableModel) tbl_projects.getModel();
+        model.setRowCount(0); // Clear existing rows
 
-    query += " GROUP BY p.projectName";
+        if (!"Manager".equals(roleName) && !"Admin".equals(roleName)) {
+            // If the user is not a Manager or Admin, do nothing
+            return;
+        }
 
-    try (Connection con = DBconnection.getConnection();
-         PreparedStatement pst = con.prepareStatement(query)) {
+        String query = "SELECT "
+                + "    p.projectName, "
+                + "    COUNT(CASE WHEN t.taskStatut = 'To do' THEN 1 END) AS ToDo, "
+                + "    COUNT(CASE WHEN t.taskStatut = 'In Progress' THEN 1 END) AS InProgress, "
+                + "    COUNT(CASE WHEN t.taskStatut = 'Done' THEN 1 END) AS Done, "
+                + "    CONCAT("
+                + "        FLOOR("
+                + "            (COUNT(CASE WHEN t.taskStatut = 'Done' THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0))"
+                + "        ), "
+                + "        '%'"
+                + "    ) AS ProgressPercentage "
+                + "FROM "
+                + "    project p "
+                + "JOIN "
+                + "    task t ON p.projectID = t.projectID ";
 
         if ("Manager".equals(roleName)) {
-            pst.setString(1, emailProject);
+            query += "INNER JOIN userp u ON p.UserID = u.UserID WHERE u.UserEmail = ?";
         }
 
-        try (ResultSet rs = pst.executeQuery()) {
-            while (rs.next()) {
-                String nameproject = rs.getString(1);
-                String todotask = rs.getString(2);
-                String inprogresstask = rs.getString(3);
-                String donetask = rs.getString(4);
-                String progress = rs.getString(5);
+        query += " GROUP BY p.projectName";
 
-                Object[] obj = {nameproject, todotask, inprogresstask, donetask, progress};
-                model.addRow(obj);
+        try (Connection con = DBconnection.getConnection(); PreparedStatement pst = con.prepareStatement(query)) {
+
+            if ("Manager".equals(roleName)) {
+                pst.setString(1, emailProject);
             }
+
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    String nameproject = rs.getString(1);
+                    String todotask = rs.getString(2);
+                    String inprogresstask = rs.getString(3);
+                    String donetask = rs.getString(4);
+                    String progress = rs.getString(5);
+
+                    Object[] obj = {nameproject, todotask, inprogresstask, donetask, progress};
+                    model.addRow(obj);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
     }
-}
- 
-   public void clearTable() {
+
+    public void clearTable() {
         DefaultTableModel model = (DefaultTableModel) tbl_projects.getModel();
         model.setRowCount(0);
     }
 
-
-      
- 
-
-
-    /*  public void showPieChart(){
-        
-        //create dataset
-      DefaultPieDataset barDataset = new DefaultPieDataset( );
-      barDataset.setValue( "IPhone 5s" , new Double( 20 ) );  
-      barDataset.setValue( "SamSung Grand" , new Double( 20 ) );   
-      barDataset.setValue( "MotoG" , new Double( 40 ) );    
-      barDataset.setValue( "Nokia Lumia" , new Double( 10 ) );  
-      
-      //create chart
-       JFreeChart piechart = ChartFactory.createPieChart("mobile sales",barDataset, false,true,false);//explain
-      
-        PiePlot piePlot =(PiePlot) piechart.getPlot();
-      
-       //changing pie chart blocks colors
-       piePlot.setSectionPaint("IPhone 5s", new Color(255,255,102));
-        piePlot.setSectionPaint("SamSung Grand", new Color(102,255,102));
-        piePlot.setSectionPaint("MotoG", new Color(255,102,153));
-        piePlot.setSectionPaint("Nokia Lumia", new Color(0,204,204));
-      
-       
-        piePlot.setBackgroundPaint(new Color(204,204,204));
-        
-        //create chartPanel to display chart(graph)
-        ChartPanel barChartPanel = new ChartPanel(piechart);
-        panelpechart.removeAll();
-        panelpechart.add(barChartPanel, BorderLayout.CENTER);
-        panelpechart.validate();
-    }
-
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -669,49 +537,37 @@ public class Dashbord extends javax.swing.JFrame {
     }//GEN-LAST:event_jLabel4MouseClicked
 
     private void jPanel5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel5MouseClicked
-            new Project().setVisible(true);
-            dispose();
-//     //   this.managePermission();
-//             if (permissionData.contains("Project edit") || permissionData.contains("Project view")) {
-//            Project project = new Project();
-//            project.setVisible(true);
-//       //     dispose();
-//
-//        }
-//        if (permissionData.contains("Project hide")) {
-//            new Project().setVisible(false);
-//            jPanel5.setVisible(false);
-//          this.dispose();
-//
-//        }
-   
+        new Project().setVisible(true);
+        dispose();
+
+
     }//GEN-LAST:event_jPanel5MouseClicked
 
     private void jPanel14MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel14MouseClicked
-     new Task().setVisible(true);
-     dispose();
+        new Task().setVisible(true);
+        dispose();
 
     }//GEN-LAST:event_jPanel14MouseClicked
 
     private void jPanel6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel6MouseClicked
-    new User().setVisible(true);
+        new User().setVisible(true);
         dispose();
     }//GEN-LAST:event_jPanel6MouseClicked
 
     private void jPanel15MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel15MouseClicked
-      new SubTask().setVisible(true);
+        new SubTask().setVisible(true);
         dispose();
-       
+
     }//GEN-LAST:event_jPanel15MouseClicked
 
     private void jPanel9MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel9MouseClicked
-       Login login=new Login();
-       login.setVisible(true);
-       dispose();
+        Login login = new Login();
+        login.setVisible(true);
+        dispose();
     }//GEN-LAST:event_jPanel9MouseClicked
 
     private void jPanel7MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel7MouseClicked
-       new Role().setVisible(true);
+        new Role().setVisible(true);
         dispose();
 
     }//GEN-LAST:event_jPanel7MouseClicked
@@ -729,7 +585,7 @@ public class Dashbord extends javax.swing.JFrame {
     }//GEN-LAST:event_jLabel8MouseClicked
 
     private void jLabel10MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel10MouseClicked
-          this.setExtendedState(Dashbord.ICONIFIED);
+        this.setExtendedState(Dashbord.ICONIFIED);
     }//GEN-LAST:event_jLabel10MouseClicked
 
     /**

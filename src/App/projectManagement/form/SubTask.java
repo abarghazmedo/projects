@@ -1,6 +1,8 @@
 package App.projectManagement.form;
 
 
+import static App.projectManagement.form.Dashbord.userNameU;
+import static App.projectManagement.form.Task.emailtasks;
 import java.awt.Image;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -47,6 +49,7 @@ public class SubTask extends javax.swing.JFrame {
         icon();
          ArrayList<String> permissionData = new Dashbord().permissionData;
         managePermissionLabel(permissionData);
+        setUserInLabel();
        
     }
     
@@ -57,6 +60,10 @@ public class SubTask extends javax.swing.JFrame {
         bindcombotask();
         icon();
         setsubTaskToTable();
+        setUserInLabel();
+    }
+     public void setUserInLabel(){
+        usershow.setText(userNameU);
     }
     
     
@@ -156,43 +163,75 @@ public class SubTask extends javax.swing.JFrame {
         return true;
     }
     
+    
+    
+    
+         public String getRoleName(){
+         String roleName=null;
+         try (Connection con = DBconnection.getConnection()) {
+             String query="SELECT r.roleName  FROM userp u , role r WHERE u.RoleID = r.RoleID AND u.UserEmail=?;";
+              try (PreparedStatement pst = con.prepareStatement(query)) {       
+                pst.setString(1, String.valueOf(emailtasks));
+                 try (ResultSet rs = pst.executeQuery()) {
+                    while (rs.next()) {
+                        roleName= rs.getString("roleName");
+                    }
+                 }catch(Exception e){
+                       e.printStackTrace();
+                 }
+            }             
+         }catch (Exception e) {
+        e.printStackTrace();
+    }
+         return roleName;
+   }
    //show data in table
-    public void setsubTaskToTable() {
+public void setsubTaskToTable() {
+    String roleName = getRoleName();
     model = (DefaultTableModel) tbl_subtask.getModel(); // Assuming tbl_task is your JTable for tasks
 
     try (Connection con = DBconnection.getConnection()) {
-        String query = "SELECT s.subtaskID, s.subtaskName, s.subtaskDescription, u.UserName, t.taskName, s.Estimer, s.subtaskPriority, s.subtaskStatut, s.subtaskType " +
-                       "FROM subtask s  " +
-                       "INNER JOIN userp u ON u.userID = s.userID  " +
+        String query = "SELECT s.subtaskID, s.subtaskName, s.subtaskDescription, s.userID AS UserIDtask, u.UserName, u.UserEmail, " +
+                       "t.userID AS UserIDtask, t.taskName, s.Estimer, s.subtaskPriority, s.subtaskStatut, s.subtaskType " +
+                       "FROM subtask s " +
                        "INNER JOIN task t ON t.taskID = s.taskID " +
-                       "WHERE u.UserEmail = ?";
-        
-     try (PreparedStatement pst = con.prepareStatement(query)) {
-        
-                pst.setString(1, String.valueOf(emailSubTasks));
-                try (ResultSet rs = pst.executeQuery()) {
-                    while (rs.next()) {
-                        int idsubtask = rs.getInt("subtaskID");
-                        String namesubtask = rs.getString("subtaskName");
-                        String descriptionsubtask = rs.getString("subtaskDescription");
-                        String assinetosubtask = rs.getString("UserName");
-                        String tasksubtask = rs.getString("taskName");
-                        int estimersubtask = rs.getInt("Estimer");
-                        String prioritysubtask = rs.getString("subtaskPriority");
-                        String statutsubtask = rs.getString("subtaskStatut");
-                        String typesubtask = rs.getString("subtaskType");
+                       "INNER JOIN userp u ON s.userID = u.UserID ";
 
-                        Object[] obj = {idsubtask, namesubtask, descriptionsubtask, assinetosubtask, tasksubtask, estimersubtask, prioritysubtask, statutsubtask, typesubtask};
-                        model = (DefaultTableModel) tbl_subtask.getModel();
-                        model.addRow(obj);
-                    }
+        if ("Manager".equals(roleName)) {
+            query = query + "WHERE u.UserID = (SELECT UserID FROM userp u WHERE u.UserEmail=?)";
+        }
+
+        if ("Developer".equals(roleName)) {
+            query = query + "WHERE u.UserEmail=?";
+        }
+        
+        try (PreparedStatement pst = con.prepareStatement(query)) {
+            if ("Manager".equals(roleName) || "Developer".equals(roleName)) {
+                pst.setString(1, String.valueOf(emailtasks));
+            }
+
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    int idsubtask = rs.getInt("subtaskID");
+                    String namesubtask = rs.getString("subtaskName");
+                    String descriptionsubtask = rs.getString("subtaskDescription");
+                    String assinetosubtask = rs.getString("UserName");
+                    String tasksubtask = rs.getString("taskName");
+                    int estimersubtask = rs.getInt("Estimer");
+                    String prioritysubtask = rs.getString("subtaskPriority");
+                    String statutsubtask = rs.getString("subtaskStatut");
+                    String typesubtask = rs.getString("subtaskType");
+
+                    Object[] obj = {idsubtask, namesubtask, descriptionsubtask, assinetosubtask, tasksubtask, estimersubtask, prioritysubtask, statutsubtask, typesubtask};
+                    model.addRow(obj);
                 }
-            
+            }
         }
     } catch (Exception e) {
         e.printStackTrace();
     }
 }
+
     
 
     //Add Subtask to table data  
@@ -333,10 +372,11 @@ public class SubTask extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
+        usershow = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
@@ -411,12 +451,6 @@ public class SubTask extends javax.swing.JFrame {
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 10, 5, 50));
 
-        jLabel2.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/adminIcons/male_user_50px.png"))); // NOI18N
-        jLabel2.setText("Welcom ,Admin");
-        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 10, 170, 50));
-
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(0, 81, 98));
         jLabel4.setText("X");
@@ -444,6 +478,16 @@ public class SubTask extends javax.swing.JFrame {
             }
         });
         jPanel1.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(1220, 10, 20, 40));
+
+        usershow.setFont(new java.awt.Font("Segoe UI Symbol", 1, 14)); // NOI18N
+        usershow.setForeground(new java.awt.Color(255, 255, 255));
+        jPanel1.add(usershow, new org.netbeans.lib.awtextra.AbsoluteConstraints(1090, 20, 70, 30));
+
+        jLabel2.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/adminIcons/male_user_50px.png"))); // NOI18N
+        jLabel2.setText("Welcom , ");
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 10, -1, 50));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1280, 70));
 
@@ -1082,5 +1126,6 @@ public class SubTask extends javax.swing.JFrame {
     private rojeru_san.complementos.RSTableMetro tbl_subtask;
     private javax.swing.JTextArea txt_descriptiontask;
     private app.bolivia.swing.JCTextField txt_nametask;
+    private javax.swing.JLabel usershow;
     // End of variables declaration//GEN-END:variables
 }

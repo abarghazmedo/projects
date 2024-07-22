@@ -2,6 +2,7 @@
 package App.projectManagement.form;
 
 
+import static App.projectManagement.form.Project.emailProject;
 import java.awt.Image;
 import java.sql.ResultSet;
 import java.sql.Connection;
@@ -9,6 +10,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.table.DefaultTableModel;
+import java.sql.PreparedStatement;
 
 
 public class Dashbord extends javax.swing.JFrame {
@@ -209,31 +211,75 @@ public class Dashbord extends javax.swing.JFrame {
         }
         
     }
+         
+               public String getRoleName(){
+         String roleName=null;
+         try (Connection con = DBconnection.getConnection()) {
+             String query="SELECT r.roleName  FROM userp u , role r WHERE u.RoleID = r.RoleID AND u.UserEmail=?;";
+              try (PreparedStatement pst = con.prepareStatement(query)) {       
+                pst.setString(1, String.valueOf(emailProject));
+                 try (ResultSet rs = pst.executeQuery()) {
+                    while (rs.next()) {
+                        roleName= rs.getString("roleName");
+                    }
+                 }catch(Exception e){
+                       e.printStackTrace();
+                 }
+            }             
+         }catch (Exception e) {
+        e.printStackTrace();
+    }
+         return roleName;
+   }
+               
+               
+               
+               
           //show details project in table 
-    public void setProjectdetailToTable() {
-        try {
-            Connection con = DBconnection.getConnection();
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("SELECT \n"
-                    + "    p.projectName, \n"
-                    + "    COUNT(CASE WHEN t.taskStatut = 'To do' THEN 1 END) AS ToDo,\n"
-                    + "    COUNT(CASE WHEN t.taskStatut = 'In Progress' THEN 1 END) AS InProgress,\n"
-                    + "    COUNT(CASE WHEN t.taskStatut = 'Done' THEN 1 END) AS Done,\n"
-                    + "    CONCAT(\n"
-                    + "        FLOOR(\n"
-                    + "            (COUNT(CASE WHEN t.taskStatut = 'Done' THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0))\n"
-                    + "        ), \n"
-                    + "        '%'\n"
-                    + "    ) AS ProgressPercentage\n"
-                    + "FROM \n"
-                    + "    project p\n"
-                    + "JOIN \n"
-                    + "    task t ON p.projectID = t.projectID\n"
-                    + "GROUP BY \n"
-                    + "    p.projectName;");
+ public void setProjectdetailToTable() {
+    String roleName = getRoleName();
+    String emailProject =Project.emailProject;
 
+    // Clear the table first
+    DefaultTableModel model = (DefaultTableModel) tbl_projects.getModel();
+    model.setRowCount(0); // Clear existing rows
+
+    if (!"Manager".equals(roleName) && !"Admin".equals(roleName)) {
+        // If the user is not a Manager or Admin, do nothing
+        return;
+    }
+
+    String query = "SELECT " +
+                   "    p.projectName, " +
+                   "    COUNT(CASE WHEN t.taskStatut = 'To do' THEN 1 END) AS ToDo, " +
+                   "    COUNT(CASE WHEN t.taskStatut = 'In Progress' THEN 1 END) AS InProgress, " +
+                   "    COUNT(CASE WHEN t.taskStatut = 'Done' THEN 1 END) AS Done, " +
+                   "    CONCAT(" +
+                   "        FLOOR(" +
+                   "            (COUNT(CASE WHEN t.taskStatut = 'Done' THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0))" +
+                   "        ), " +
+                   "        '%'" +
+                   "    ) AS ProgressPercentage " +
+                   "FROM " +
+                   "    project p " +
+                   "JOIN " +
+                   "    task t ON p.projectID = t.projectID ";
+
+    if ("Manager".equals(roleName)) {
+        query += "INNER JOIN userp u ON p.UserID = u.UserID WHERE u.UserEmail = ?";
+    }
+
+    query += " GROUP BY p.projectName";
+
+    try (Connection con = DBconnection.getConnection();
+         PreparedStatement pst = con.prepareStatement(query)) {
+
+        if ("Manager".equals(roleName)) {
+            pst.setString(1, emailProject);
+        }
+
+        try (ResultSet rs = pst.executeQuery()) {
             while (rs.next()) {
-
                 String nameproject = rs.getString(1);
                 String todotask = rs.getString(2);
                 String inprogresstask = rs.getString(3);
@@ -241,15 +287,20 @@ public class Dashbord extends javax.swing.JFrame {
                 String progress = rs.getString(5);
 
                 Object[] obj = {nameproject, todotask, inprogresstask, donetask, progress};
-                DefaultTableModel model = (DefaultTableModel) tbl_projects.getModel();
                 model.addRow(obj);
-
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+}
+ 
+   public void clearTable() {
+        DefaultTableModel model = (DefaultTableModel) tbl_projects.getModel();
+        model.setRowCount(0);
+    }
+
+
       
  
 
@@ -363,7 +414,7 @@ public class Dashbord extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/adminIcons/male_user_50px.png"))); // NOI18N
-        jLabel2.setText("Welcom ");
+        jLabel2.setText("Welcom , ");
         jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 10, -1, 50));
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
@@ -389,8 +440,8 @@ public class Dashbord extends javax.swing.JFrame {
         });
         jPanel1.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(1220, 10, -1, 30));
 
-        usershow.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
-        usershow.setForeground(new java.awt.Color(0, 81, 98));
+        usershow.setFont(new java.awt.Font("Segoe UI Symbol", 1, 14)); // NOI18N
+        usershow.setForeground(new java.awt.Color(255, 255, 255));
         jPanel1.add(usershow, new org.netbeans.lib.awtextra.AbsoluteConstraints(1090, 20, 70, 30));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1280, 70));

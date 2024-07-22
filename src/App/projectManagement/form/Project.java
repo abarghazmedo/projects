@@ -2,6 +2,7 @@ package App.projectManagement.form;
 
 
 
+import static App.projectManagement.form.Dashbord.userNameU;
 import java.awt.Image;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
@@ -50,8 +51,9 @@ public class Project extends javax.swing.JFrame {
         initComponents();   
         setProjectdetailToTable();
         bindcomboUser();
-        icon(); 
-        
+        icon();
+        setUserInLabel();
+
         ArrayList<String> permissionData = new Dashbord().permissionData;
         managePermissionLabel(permissionData);
         
@@ -63,6 +65,10 @@ public class Project extends javax.swing.JFrame {
         bindcomboUser();
         icon();
         setProjectdetailToTable();
+        setUserInLabel();
+    }
+      public void setUserInLabel(){
+        usershow.setText(userNameU);
     }
  
      
@@ -224,30 +230,58 @@ public class Project extends javax.swing.JFrame {
 
     return isExist;
 }
+    
+      public String getRoleName(){
+         String roleName=null;
+         try (Connection con = DBconnection.getConnection()) {
+             String query="SELECT r.roleName  FROM userp u , role r WHERE u.RoleID = r.RoleID AND u.UserEmail=?;";
+              try (PreparedStatement pst = con.prepareStatement(query)) {       
+                pst.setString(1, String.valueOf(emailProject));
+                 try (ResultSet rs = pst.executeQuery()) {
+                    while (rs.next()) {
+                        roleName= rs.getString("roleName");
+                    }
+                 }catch(Exception e){
+                       e.printStackTrace();
+                 }
+            }             
+         }catch (Exception e) {
+        e.printStackTrace();
+    }
+         return roleName;
+   }
+     
 
     //show details project in table 
    public void setProjectdetailToTable() {
+        String roleName= getRoleName();
     try (Connection con = DBconnection.getConnection()) {
-        String query = "SELECT p.projectID, p.projectName, p.projectDescription, p.Startdate, p.ENDdate, u.UserName " +
-                       "FROM `project` p " +
-                       "INNER JOIN `userp` u ON u.UserID = p.UserID " +
-                       "WHERE u.UserEmail = ?";
+        String query = "SELECT p.projectID, p.projectName, p.projectDescription, p.Startdate, p.ENDdate, u.UserName "
+                + "FROM `project` p "
+                + "INNER JOIN `userp` u ON u.UserID = p.UserID ";
 
-            try (PreparedStatement pst = con.prepareStatement(query)) {
-                pst.setString(1, String.valueOf(emailProject));
-                try (ResultSet rs = pst.executeQuery()) {
-                    while (rs.next()) {
-                        int idproject = rs.getInt("projectID");
-                        String nameproject = rs.getString("projectName");
-                        String descriptionproject = rs.getString("projectDescription");
-                        String Startdate = rs.getString("Startdate");
-                        String Enddate = rs.getString("ENDdate");
-                        String manager = rs.getString("UserName");
+        if ("Manager".equals(roleName)) {
+            query = query + "WHERE u.UserEmail = ?";
+        }
 
-                        Object[] obj = {idproject, nameproject, descriptionproject, Startdate, Enddate, manager};
-                        model = (DefaultTableModel) tbl_project.getModel();
-                        model.addRow(obj);
-                    }
+        try (PreparedStatement pst = con.prepareStatement(query)) {    
+                   if ("Manager".equals(roleName)) {
+                    pst.setString(1, String.valueOf(emailProject));
+                }
+            try (ResultSet rs = pst.executeQuery()) {
+                
+                while (rs.next()) {
+                    int idproject = rs.getInt("projectID");
+                    String nameproject = rs.getString("projectName");
+                    String descriptionproject = rs.getString("projectDescription");
+                    String Startdate = rs.getString("Startdate");
+                    String Enddate = rs.getString("ENDdate");
+                    String manager = rs.getString("UserName");
+
+                    Object[] obj = {idproject, nameproject, descriptionproject, Startdate, Enddate, manager};
+                    model = (DefaultTableModel) tbl_project.getModel();
+                    model.addRow(obj);
+                }
                 }
             }
         
@@ -445,9 +479,10 @@ public class Project extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
+        usershow = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
@@ -528,12 +563,6 @@ public class Project extends javax.swing.JFrame {
         });
         jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 10, 210, 50));
 
-        jLabel2.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/adminIcons/male_user_50px.png"))); // NOI18N
-        jLabel2.setText("Welcom ,Admin");
-        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 10, 170, 50));
-
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(0, 81, 98));
         jLabel4.setText("X");
@@ -553,6 +582,16 @@ public class Project extends javax.swing.JFrame {
             }
         });
         jPanel1.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(1220, 10, 30, 20));
+
+        usershow.setFont(new java.awt.Font("Segoe UI Symbol", 1, 14)); // NOI18N
+        usershow.setForeground(new java.awt.Color(255, 255, 255));
+        jPanel1.add(usershow, new org.netbeans.lib.awtextra.AbsoluteConstraints(1090, 20, 70, 30));
+
+        jLabel2.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/adminIcons/male_user_50px.png"))); // NOI18N
+        jLabel2.setText("Welcom , ");
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 10, -1, 50));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1280, 70));
 
@@ -1161,6 +1200,7 @@ public class Project extends javax.swing.JFrame {
     private rojeru_san.complementos.RSTableMetro tbl_project;
     private javax.swing.JTextArea txt_description;
     private app.bolivia.swing.JCTextField txt_nameproject;
+    private javax.swing.JLabel usershow;
     // End of variables declaration//GEN-END:variables
 }
 

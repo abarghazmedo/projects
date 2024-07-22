@@ -7,6 +7,7 @@ package App.projectManagement.form;
 import static App.projectManagement.form.SubTask.emailSubTasks;
 import static App.projectManagement.form.SubTask.idsubTask;
 import static App.projectManagement.form.SubTask.taskId;
+import static App.projectManagement.form.Task.emailtasks;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.Connection;
@@ -48,38 +49,67 @@ public class fichierSubTask extends javax.swing.JFrame {
     }
     
    
-    //show details subtask in table  
- public void setsubTaskToTable() {
+        
+         public String getRoleName(){
+         String roleName=null;
+         try (Connection con = DBconnection.getConnection()) {
+             String query="SELECT r.roleName  FROM userp u , role r WHERE u.RoleID = r.RoleID AND u.UserEmail=?;";
+              try (PreparedStatement pst = con.prepareStatement(query)) {       
+                pst.setString(1, String.valueOf(emailtasks));
+                 try (ResultSet rs = pst.executeQuery()) {
+                    while (rs.next()) {
+                        roleName= rs.getString("roleName");
+                    }
+                 }catch(Exception e){
+                       e.printStackTrace();
+                 }
+            }             
+         }catch (Exception e) {
+        e.printStackTrace();
+    }
+         return roleName;
+   }
+   //show data in table
+public void setsubTaskToTable() {
+    String roleName = getRoleName();
     model = (DefaultTableModel) tbl_subtask.getModel(); // Assuming tbl_task is your JTable for tasks
 
     try (Connection con = DBconnection.getConnection()) {
-        String query = "SELECT s.subtaskID, s.subtaskName, s.subtaskDescription, u.UserName, t.taskName, s.Estimer, s.subtaskPriority, s.subtaskStatut, s.subtaskType " +
-                       "FROM subtask s  " +
-                       "INNER JOIN userp u ON u.userID = s.userID  " +
+        String query = "SELECT s.subtaskID, s.subtaskName, s.subtaskDescription, s.userID AS UserIDtask, u.UserName, u.UserEmail, " +
+                       "t.userID AS UserIDtask, t.taskName, s.Estimer, s.subtaskPriority, s.subtaskStatut, s.subtaskType " +
+                       "FROM subtask s " +
                        "INNER JOIN task t ON t.taskID = s.taskID " +
-                       "WHERE u.UserEmail = ?";
-        
-     try (PreparedStatement pst = con.prepareStatement(query)) {
-        
-                pst.setString(1, String.valueOf(emailSubTasks));
-                try (ResultSet rs = pst.executeQuery()) {
-                    while (rs.next()) {
-                        int idsubtask = rs.getInt("subtaskID");
-                        String namesubtask = rs.getString("subtaskName");
-                        String descriptionsubtask = rs.getString("subtaskDescription");
-                        String assinetosubtask = rs.getString("UserName");
-                        String tasksubtask = rs.getString("taskName");
-                        int estimersubtask = rs.getInt("Estimer");
-                        String prioritysubtask = rs.getString("subtaskPriority");
-                        String statutsubtask = rs.getString("subtaskStatut");
-                        String typesubtask = rs.getString("subtaskType");
+                       "INNER JOIN userp u ON s.userID = u.UserID ";
 
-                        Object[] obj = {idsubtask, namesubtask, descriptionsubtask, assinetosubtask, tasksubtask, estimersubtask, prioritysubtask, statutsubtask, typesubtask};
-                        model = (DefaultTableModel) tbl_subtask.getModel();
-                        model.addRow(obj);
-                    }
+        if ("Manager".equals(roleName)) {
+            query = query + "WHERE u.UserID = (SELECT UserID FROM userp u WHERE u.UserEmail=?)";
+        }
+
+        if ("Developer".equals(roleName)) {
+            query = query + "WHERE u.UserEmail=?";
+        }
+        
+        try (PreparedStatement pst = con.prepareStatement(query)) {
+            if ("Manager".equals(roleName) || "Developer".equals(roleName)) {
+                pst.setString(1, String.valueOf(emailtasks));
+            }
+
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    int idsubtask = rs.getInt("subtaskID");
+                    String namesubtask = rs.getString("subtaskName");
+                    String descriptionsubtask = rs.getString("subtaskDescription");
+                    String assinetosubtask = rs.getString("UserName");
+                    String tasksubtask = rs.getString("taskName");
+                    int estimersubtask = rs.getInt("Estimer");
+                    String prioritysubtask = rs.getString("subtaskPriority");
+                    String statutsubtask = rs.getString("subtaskStatut");
+                    String typesubtask = rs.getString("subtaskType");
+
+                    Object[] obj = {idsubtask, namesubtask, descriptionsubtask, assinetosubtask, tasksubtask, estimersubtask, prioritysubtask, statutsubtask, typesubtask};
+                    model.addRow(obj);
                 }
-            
+            }
         }
     } catch (Exception e) {
         e.printStackTrace();

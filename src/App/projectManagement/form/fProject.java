@@ -92,29 +92,57 @@ public class fProject extends javax.swing.JFrame {
     }
     
 
-      //show details project in table 
-   public void setProjectdetailToTable() {
-    try (Connection con = DBconnection.getConnection()) {
-        String query = "SELECT p.projectID, p.projectName, p.projectDescription, p.Startdate, p.ENDdate, u.UserName " +
-                       "FROM `project` p " +
-                       "INNER JOIN `userp` u ON u.UserID = p.UserID " +
-                       "WHERE u.UserEmail = ?";
-
-            try (PreparedStatement pst = con.prepareStatement(query)) {
+      public String getRoleName(){
+         String roleName=null;
+         try (Connection con = DBconnection.getConnection()) {
+             String query="SELECT r.roleName  FROM userp u , role r WHERE u.RoleID = r.RoleID AND u.UserEmail=?;";
+              try (PreparedStatement pst = con.prepareStatement(query)) {       
                 pst.setString(1, String.valueOf(emailProject));
-                try (ResultSet rs = pst.executeQuery()) {
+                 try (ResultSet rs = pst.executeQuery()) {
                     while (rs.next()) {
-                        int idproject = rs.getInt("projectID");
-                        String nameproject = rs.getString("projectName");
-                        String descriptionproject = rs.getString("projectDescription");
-                        String Startdate = rs.getString("Startdate");
-                        String Enddate = rs.getString("ENDdate");
-                        String manager = rs.getString("UserName");
-
-                        Object[] obj = {idproject, nameproject, descriptionproject, Startdate, Enddate, manager};
-                        model = (DefaultTableModel) tbl_project.getModel();
-                        model.addRow(obj);
+                        roleName= rs.getString("roleName");
                     }
+                 }catch(Exception e){
+                       e.printStackTrace();
+                 }
+            }             
+         }catch (Exception e) {
+        e.printStackTrace();
+    }
+         return roleName;
+   }
+     
+
+    //show details project in table 
+   public void setProjectdetailToTable() {
+        String roleName= getRoleName();
+    try (Connection con = DBconnection.getConnection()) {
+        String query = "SELECT p.projectID, p.projectName, p.projectDescription, p.Startdate, p.ENDdate, u.UserName "
+                + "FROM `project` p "
+                + "INNER JOIN `userp` u ON u.UserID = p.UserID ";
+
+        if ("Manager".equals(roleName)) {
+            query = query + "WHERE u.UserEmail = ?";
+        }
+
+        try (PreparedStatement pst = con.prepareStatement(query)) {    
+                   if ("Manager".equals(roleName)) {
+                    pst.setString(1, String.valueOf(emailProject));
+                }
+            try (ResultSet rs = pst.executeQuery()) {
+                
+                while (rs.next()) {
+                    int idproject = rs.getInt("projectID");
+                    String nameproject = rs.getString("projectName");
+                    String descriptionproject = rs.getString("projectDescription");
+                    String Startdate = rs.getString("Startdate");
+                    String Enddate = rs.getString("ENDdate");
+                    String manager = rs.getString("UserName");
+
+                    Object[] obj = {idproject, nameproject, descriptionproject, Startdate, Enddate, manager};
+                    model = (DefaultTableModel) tbl_project.getModel();
+                    model.addRow(obj);
+                }
                 }
             }
         

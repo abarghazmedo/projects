@@ -2,6 +2,7 @@
 package App.projectManagement.form;
 
 
+import static App.projectManagement.form.Dashbord.userNameU;
 import static App.projectManagement.form.SubTask.Estimer;
 import java.awt.Image;
 import java.sql.ResultSet;
@@ -50,6 +51,7 @@ public class Task extends javax.swing.JFrame {
         icon();
         ArrayList<String> permissionData = new Dashbord().permissionData;
         managePermissionLabel(permissionData);
+        setUserInLabel();
      
         
     }
@@ -60,7 +62,11 @@ public class Task extends javax.swing.JFrame {
         bindcomboproject();
         icon();
         setTaskToTable();
+        setUserInLabel();
         
+    }
+     public void setUserInLabel(){
+        usershow.setText(userNameU);
     }
  
     
@@ -182,20 +188,54 @@ public class Task extends javax.swing.JFrame {
 //}  
     
     
+     public String getRoleName(){
+         String roleName=null;
+         try (Connection con = DBconnection.getConnection()) {
+             String query="SELECT r.roleName  FROM userp u , role r WHERE u.RoleID = r.RoleID AND u.UserEmail=?;";
+              try (PreparedStatement pst = con.prepareStatement(query)) {       
+                pst.setString(1, String.valueOf(emailtasks));
+                 try (ResultSet rs = pst.executeQuery()) {
+                    while (rs.next()) {
+                        roleName= rs.getString("roleName");
+                    }
+                 }catch(Exception e){
+                       e.printStackTrace();
+                 }
+            }             
+         }catch (Exception e) {
+        e.printStackTrace();
+    }
+         return roleName;
+   }
+     
     //show details task in table  
- public void setTaskToTable() {
+    public void setTaskToTable() {
+        String roleName = getRoleName();
+        System.out.println(roleName);
         model = (DefaultTableModel) tbl_task.getModel(); // Assuming tbl_task is your JTable for tasks
 
         try (Connection con = DBconnection.getConnection()) {
-            String query = "SELECT t.taskID, t.taskName, t.taskDescription,u.UserName,p.projectName, t.Estimer, t.taskPriority, t.taskStatut, t.taskType \n" +
-"FROM task t , userp u , project p \n" +
-"WHERE p.projectID = t.projectID \n" +
-"AND (( u.userID = t.UserID ) or ( ( u.userID = p.UserID and u.RoleID in (select RoleID from role where roleName in "
-                    + "('manager')))) or u.RoleID in"
-                    + " (select RoleID from role where roleName in ('admin')) ) AND u.UserEmail=?;";
+            String query = "SELECT t.taskID, t.taskName, t.taskDescription, t.userID AS UserIDtask , u.UserName,u.UserEmail,\n"
+                    + "p.UserID AS UserIDproject ,p.projectName, t.Estimer, t.taskPriority, t.taskStatut, t.taskType \n"
+                    + "FROM task t \n"
+                    + "INNER JOIN project p ON p.projectID = t.projectID \n"
+                    + "INNER JOIN userp u ON t.userID = u.UserID ";
 
-        try (PreparedStatement pst = con.prepareStatement(query)) {       
-                pst.setString(1, String.valueOf(emailtasks));
+            if ("Manager".equals(roleName)) {
+                query = query + "WHERE p.UserID = (SELECT UserID FROM userp u WHERE u.UserEmail=?)";
+            }
+
+            if ("Developer".equals(roleName)) {
+
+                query = query + "WHERE u.UserEmail=?";
+            }
+            System.out.println("Developer".equals(roleName));
+            System.out.println(query);
+
+            try (PreparedStatement pst = con.prepareStatement(query)) {
+                if ("Manager".equals(roleName) || "Developer".equals(roleName)) {
+                    pst.setString(1, String.valueOf(emailtasks));
+                }
                 try (ResultSet rs = pst.executeQuery()) {
                     while (rs.next()) {
                         int taskId = rs.getInt("taskID");
@@ -365,10 +405,11 @@ public class Task extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
+        usershow = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
@@ -444,12 +485,6 @@ public class Task extends javax.swing.JFrame {
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 10, 5, 50));
 
-        jLabel2.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/adminIcons/male_user_50px.png"))); // NOI18N
-        jLabel2.setText("Welcom ,Admin");
-        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 10, 170, 50));
-
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(0, 81, 98));
         jLabel4.setText("X");
@@ -477,6 +512,16 @@ public class Task extends javax.swing.JFrame {
             }
         });
         jPanel1.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(1220, 10, 20, 30));
+
+        usershow.setFont(new java.awt.Font("Segoe UI Symbol", 1, 14)); // NOI18N
+        usershow.setForeground(new java.awt.Color(255, 255, 255));
+        jPanel1.add(usershow, new org.netbeans.lib.awtextra.AbsoluteConstraints(1090, 20, 70, 30));
+
+        jLabel2.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/adminIcons/male_user_50px.png"))); // NOI18N
+        jLabel2.setText("Welcom , ");
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 10, -1, 50));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1280, 70));
 
@@ -1135,5 +1180,6 @@ dispose();
     private rojeru_san.complementos.RSTableMetro tbl_task;
     private javax.swing.JTextArea txt_descriptiontask;
     private app.bolivia.swing.JCTextField txt_nametask;
+    private javax.swing.JLabel usershow;
     // End of variables declaration//GEN-END:variables
 }

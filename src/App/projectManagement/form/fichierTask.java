@@ -48,20 +48,54 @@ public class fichierTask extends javax.swing.JFrame {
     
    
    
-      //show details task in table  
- public void setTaskToTable() {
-    model = (DefaultTableModel) tbl_task.getModel(); // Assuming tbl_task is your JTable for tasks
-
-    try (Connection con = DBconnection.getConnection()) {
-        String query = "SELECT t.taskID, t.taskName, t.taskDescription, t.userID , u.UserName,u.UserEmail,p.UserID ,p.projectName, t.Estimer, t.taskPriority, t.taskStatut, t.taskType \n" +
-"FROM task t , userp u , project p \n" +
-"WHERE p.projectID = t.projectID \n" +
-"AND (( u.userID = t.UserID ) or ( ( u.userID = p.UserID and u.RoleID in (select RoleID from role where roleName in ('manager')))) "
-                + "or u.RoleID in (select RoleID from role where roleName in"
-                + " ('admin')) ) AND u.UserEmail=?;";
-
-        try (PreparedStatement pst = con.prepareStatement(query)) {       
+     public String getRoleName(){
+         String roleName=null;
+         try (Connection con = DBconnection.getConnection()) {
+             String query="SELECT r.roleName  FROM userp u , role r WHERE u.RoleID = r.RoleID AND u.UserEmail=?;";
+              try (PreparedStatement pst = con.prepareStatement(query)) {       
                 pst.setString(1, String.valueOf(emailtasks));
+                 try (ResultSet rs = pst.executeQuery()) {
+                    while (rs.next()) {
+                        roleName= rs.getString("roleName");
+                    }
+                 }catch(Exception e){
+                       e.printStackTrace();
+                 }
+            }             
+         }catch (Exception e) {
+        e.printStackTrace();
+    }
+         return roleName;
+   }
+     
+    //show details task in table  
+    public void setTaskToTable() {
+        String roleName = getRoleName();
+        System.out.println(roleName);
+        model = (DefaultTableModel) tbl_task.getModel(); // Assuming tbl_task is your JTable for tasks
+
+        try (Connection con = DBconnection.getConnection()) {
+            String query = "SELECT t.taskID, t.taskName, t.taskDescription, t.userID AS UserIDtask , u.UserName,u.UserEmail,\n"
+                    + "p.UserID AS UserIDproject ,p.projectName, t.Estimer, t.taskPriority, t.taskStatut, t.taskType \n"
+                    + "FROM task t \n"
+                    + "INNER JOIN project p ON p.projectID = t.projectID \n"
+                    + "INNER JOIN userp u ON t.userID = u.UserID ";
+
+            if ("Manager".equals(roleName)) {
+                query = query + "WHERE p.UserID = (SELECT UserID FROM userp u WHERE u.UserEmail=?)";
+            }
+
+            if ("Developer".equals(roleName)) {
+
+                query = query + "WHERE u.UserEmail=?";
+            }
+            System.out.println("Developer".equals(roleName));
+            System.out.println(query);
+
+            try (PreparedStatement pst = con.prepareStatement(query)) {
+                if ("Manager".equals(roleName) || "Developer".equals(roleName)) {
+                    pst.setString(1, String.valueOf(emailtasks));
+                }
                 try (ResultSet rs = pst.executeQuery()) {
                     while (rs.next()) {
                         int taskId = rs.getInt("taskID");

@@ -3,6 +3,7 @@ package App.projectManagement.form;
 
 
 
+import static App.projectManagement.form.Dashbord.userNameU;
 import java.awt.Image;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -36,8 +37,12 @@ public class Role extends javax.swing.JFrame {
         icon();
         ArrayList<String> permissionData = new Dashbord().permissionData;
         managePermissionLabel(permissionData);
+        setUserInLabel();
 
     } 
+     public void setUserInLabel(){
+        usershow.setText(userNameU);
+    }
  
             
     
@@ -227,10 +232,11 @@ public class Role extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
+        usershow = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
@@ -285,12 +291,6 @@ public class Role extends javax.swing.JFrame {
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 10, 5, 50));
 
-        jLabel2.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/adminIcons/male_user_50px.png"))); // NOI18N
-        jLabel2.setText("Welcom ,Admin");
-        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 10, 170, 50));
-
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(0, 81, 98));
         jLabel4.setText("X");
@@ -318,6 +318,16 @@ public class Role extends javax.swing.JFrame {
             }
         });
         jPanel1.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(1220, 20, 20, 30));
+
+        usershow.setFont(new java.awt.Font("Segoe UI Symbol", 1, 14)); // NOI18N
+        usershow.setForeground(new java.awt.Color(255, 255, 255));
+        jPanel1.add(usershow, new org.netbeans.lib.awtextra.AbsoluteConstraints(1090, 20, 70, 30));
+
+        jLabel2.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/adminIcons/male_user_50px.png"))); // NOI18N
+        jLabel2.setText("Welcom , ");
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 10, -1, 50));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1280, 70));
 
@@ -715,5 +725,6 @@ dispose();
     private javax.swing.JScrollPane jScrollPane1;
     private rojeru_san.complementos.RSTableMetro tbl_project;
     private app.bolivia.swing.JCTextField txt_nameRole;
+    private javax.swing.JLabel usershow;
     // End of variables declaration//GEN-END:variables
 }
